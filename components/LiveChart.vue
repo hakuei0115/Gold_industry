@@ -10,67 +10,84 @@ import { Chart, registerables } from "chart.js";
 
 Chart.register(...registerables);
 
+// 接收父層傳入的標題用於圖表 label
 const props = defineProps({
-  sensorKey: String,  // 傳入的感測器名稱
-  label: String       // 圖表標題
+  label: String
 });
 
 const chartCanvas = ref(null);
 let chartInstance = null;
 
+// 初始化圖表
 onMounted(() => {
   if (!chartCanvas.value) return;
 
-  // 創建 Chart.js 折線圖
   chartInstance = new Chart(chartCanvas.value, {
     type: "line",
     data: {
-      labels: [], // X 軸時間
+      labels: [], // 時間
       datasets: [
         {
-          label: props.label,
-          data: [], // Y 軸數值
-          borderColor: "rgba(75, 192, 192, 1)",
-          backgroundColor: "rgba(75, 192, 192, 0.2)",
+          label: `${props.label} - Flow`,
+          data: [],
+          borderColor: "rgba(54, 162, 235, 1)", // 藍色
+          backgroundColor: "rgba(54, 162, 235, 0.2)",
           borderWidth: 2,
-          tension: 0.2, // 平滑折線
+          tension: 0.3,
+        },
+        {
+          label: `${props.label} - Pressure`,
+          data: [],
+          borderColor: "rgba(255, 99, 132, 1)", // 紅色
+          backgroundColor: "rgba(255, 99, 132, 0.2)",
+          borderWidth: 2,
+          tension: 0.3,
         },
       ],
     },
     options: {
       responsive: true,
-      animation: false, // 禁用動畫提高效能
+      animation: false,
+      plugins: {
+        legend: {
+          display: true,
+        },
+      },
       scales: {
         x: {
           title: { display: true, text: "時間" },
-          ticks: { display: false },
+          ticks: { display: false }
         },
         y: {
           title: { display: true, text: "數值" },
-          beginAtZero: true,
-        },
-      },
-    },
+          beginAtZero: true
+        }
+      }
+    }
   });
 });
 
-// 更新折線圖
-function updateChart(timestamp, value) {
-  if (!chartInstance) return;
+// 提供給父層更新圖表的方法
+function updateChart(timestamp, { flow, pressure }) {
+  const labels = chartInstance.data.labels;
+  const flowData = chartInstance.data.datasets[0].data;
+  const pressureData = chartInstance.data.datasets[1].data;
 
-  const chartData = chartInstance.data;
-  if (chartData.labels.length > 50) {
-    chartData.labels.shift();
-    chartData.datasets[0].data.shift();
+  const time = new Date(timestamp * 1000).toLocaleTimeString();
+
+  if (labels.length > 50) {
+    labels.shift();
+    flowData.shift();
+    pressureData.shift();
   }
 
-  chartData.labels.push(new Date(timestamp * 1000).toLocaleTimeString());
-  chartData.datasets[0].data.push(value);
+  labels.push(time);
+  flowData.push(flow);
+  pressureData.push(pressure);
 
   chartInstance.update();
 }
 
-// **確保 `updateChart` 方法可被 `App.vue` 調用**
 defineExpose({ updateChart });
 
 onUnmounted(() => {
