@@ -1,5 +1,6 @@
 <template>
     <div class="chart-container">
+      <h3 class="chart-title">{{ label }}</h3>
       <canvas ref="canvas" width="600" height="200"></canvas>
     </div>
   </template>
@@ -29,15 +30,15 @@
   
   onMounted(() => {
     chart = new SmoothieChart({
-      millisPerPixel: 20,
+      millisPerPixel: 20, // 每個畫素代表 20 毫秒。值越小，速度越快，資料越「壓縮」。
       grid: {
-        strokeStyle: 'rgba(119,119,119,0.2)',
-        lineWidth: 1,
-        fillStyle: '#ffffff',
-        millisPerLine: 1000,
-        verticalSections: 4,
+        strokeStyle: 'rgba(119,119,119,0.2)', // 網格線顏色
+        lineWidth: 1, // 網格線寬度
+        fillStyle: '#ffffff', // 網格背景顏色
+        millisPerLine: 1000, // 每條網格線間隔 1000 毫秒
+        verticalSections: 4, // 垂直分段數
       },
-      labels: { fillStyle: '#red' },
+      labels: { fillStyle: '#red' }, // 標籤顏色
       timestampFormatter: date => '' // 不顯示時間字串
     })
   
@@ -64,8 +65,17 @@
   <style scoped>
   .chart-container {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
     margin-bottom: 20px;
   }
+  
+  .chart-title {
+    margin-bottom: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+  }
   </style>
+  
   

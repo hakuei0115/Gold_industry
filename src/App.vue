@@ -28,7 +28,9 @@ onUnmounted(() => {
 
 <style scoped>
 .app {
+  gap: 20px;
   padding: 20px;
-  text-align: center;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
 }
 </style>
