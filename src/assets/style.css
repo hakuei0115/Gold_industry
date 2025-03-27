@@ -1,0 +1,21 @@
+@import './reset.css';
+
+:root {
+    /* Colors */
+    --light-white: #FFFFFF;
+    --dark-white: #F8F8F8;
+    --font-black: #353535;
+    --font-gray-light: #DFDFDF;
+    --font-gray-dark: #9e9ea7;
+    --font-blue: #168aef;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color:  #F8F8F8;
+    color: var(--font-black);
+}
+
+* {
+    box-sizing: border-box;
+}

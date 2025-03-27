@@ -47,6 +47,13 @@
         <SmoothieChart ref="sensorChart5" label="Sensor 5 Chart" />
         <SmoothieChart ref="sensorChart6" label="Sensor 6 Chart" />
       </div>
+      <div class="alert-log">
+        <!-- 異常訊息區 -->
+        <AlertLog :alerts="alertList" />
+
+        <!-- 資料紀錄區 -->
+        <LiveDataLog :logs="dataLog" />
+      </div>
     </div>
   </div>
 </template>
@@ -55,6 +62,8 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import SmoothieChart from './components/SmoothieChart.vue'
 import SensorCard from './components/SensorCard.vue'
+import AlertLog from './components/AlertLog.vue'
+import LiveDataLog from './components/LiveDataLog.vue'
 
 const sensorChart1 = ref(null)
 const sensorChart2 = ref(null)
@@ -91,8 +100,50 @@ const sensorData = ref({
   }
 })
 
+const alertList = ref([])
+
+function checkForAlerts(sensorName, flow, pressure) {
+  const now = new Date().toLocaleTimeString()
+  if (flow > 210) {
+    alertList.value.push({
+      time: now,
+      type: 'warning',
+      message: `${sensorName} 流量過高`
+    })
+  }
+
+  if (pressure > 250) {
+    alertList.value.push({
+      time: now,
+      type: 'danger',
+      message: `${sensorName} 壓力過高`
+    })
+  }
+
+  if (alertList.value.length > 20) {
+    alertList.value.pop()
+  }
+}
+
+const dataLog = ref([])
+
+function recordData(flow, pressure) {
+  const now = new Date().toLocaleTimeString()
+
+  dataLog.value.unshift({
+    time: now,
+    flow,
+    pressure
+  })
+
+  if (dataLog.value.length > 20) {
+    dataLog.value.pop()
+  }
+}
+
 // 這裡我們先用假數據模擬，即時更新 sensorData 以及圖表
 let simulationInterval = null
+let cleanupInterval = null
 onMounted(() => {
   simulationInterval = setInterval(() => {
     const fakeFlow = 200 + Math.random() * 50
@@ -124,11 +175,32 @@ onMounted(() => {
     sensorChart4.value?.addDataPoint(fakeFlow, fakePressure)
     sensorChart5.value?.addDataPoint(fakeFlow, fakePressure)
     sensorChart6.value?.addDataPoint(fakeFlow, fakePressure)
+
+    // 檢查是否有異常，並更新異常訊息
+    checkForAlerts('Sensor 1', fakeFlow, fakePressure)
+    checkForAlerts('Sensor 2', fakeFlow, fakePressure)
+    checkForAlerts('Sensor 3', fakeFlow, fakePressure)
+    checkForAlerts('Sensor 4', fakeFlow, fakePressure)
+    checkForAlerts('Sensor 5', fakeFlow, fakePressure)
+    checkForAlerts('Sensor 6', fakeFlow, fakePressure)
+
+    recordData(fakeFlow, fakePressure)
   }, 50) // 模擬 20Hz
+
+  // 每秒清一次過期告警
+  cleanupInterval = setInterval(() => {
+    const now = Date.now()
+    for (let i = alertList.value.length - 1; i >= 0; i--) {
+      if (now - alertList.value[i].timestamp >= 10000) {
+        alertList.value.splice(i, 1)
+      }
+    }
+  }, 1000)
 })
 
 onUnmounted(() => {
   clearInterval(simulationInterval)
+  clearInterval(cleanupInterval)
 })
 </script>
 
@@ -142,6 +214,11 @@ onUnmounted(() => {
   margin-bottom: 20px;
 }
 
+.header h1 {
+  font-size: 24px;
+  font-weight: bold;
+}
+
 .card {
   display: flex;
   flex-wrap: wrap;
@@ -150,6 +227,13 @@ onUnmounted(() => {
 }
 
 .chart {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
+.alert-log {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
