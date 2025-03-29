@@ -21,14 +21,16 @@
 
 <style scoped>
 .alert-log {
-    width: 100%;
-    max-width: 600px;
+    width: 50%;
     margin-top: 16px;
-    padding: 12px;
+    padding: 12px;  
     background: #fff;
     border: 1px solid #ccc;
     border-radius: 4px;
-    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .alert-log h3 {

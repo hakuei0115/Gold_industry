@@ -25,8 +25,14 @@ const pressureSeries = new TimeSeries()
 // 外部透過這個方法傳入數據
 function addDataPoint(flow, pressure) {
   const now = Date.now()
-  flowSeries.append(now, flow)
-  pressureSeries.append(now, pressure)
+  
+  if (!isNaN(flow) && flow >= 0 && flow <= 1024) {
+    flowSeries.append(now, flow)
+  }
+
+  if (!isNaN(pressure) && pressure >= 0 && pressure <= 1024) {
+    pressureSeries.append(now, pressure)
+  }
 }
 defineExpose({ addDataPoint })
 
@@ -48,15 +54,19 @@ onMounted(() => {
     strokeStyle: 'rgba(0, 123, 255, 1)',
     fillStyle: 'rgba(0, 123, 255, 0.1)',
     lineWidth: 2,
+    maxValue: 1024,
+    minValue: 0,
   })
 
   chart.addTimeSeries(pressureSeries, {
     strokeStyle: 'rgba(220, 53, 69, 1)',
     fillStyle: 'rgba(220, 53, 69, 0.1)',
     lineWidth: 2,
+    maxValue: 1024,
+    minValue: 0,
   })
 
-  chart.streamTo(canvas.value, 1000)
+  chart.streamTo(canvas.value, 500)
 })
 
 onUnmounted(() => {

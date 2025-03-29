@@ -127,16 +127,14 @@ function checkForAlerts(sensorName, flow, pressure) {
 
 const dataLog = ref([])
 
-function recordData(flow, pressure) {
-  const now = new Date().toLocaleTimeString()
-
+function recordData(sensorData) {
+  const time = new Date().toLocaleTimeString()
   dataLog.value.unshift({
-    time: now,
-    flow,
-    pressure
+    timestamp: time,
+    sensors: { ...sensorData } // 深拷貝當下所有感測器資料
   })
 
-  if (dataLog.value.length > 20) {
+  if (dataLog.value.length > 5) {
     dataLog.value.pop()
   }
 }
@@ -184,7 +182,7 @@ onMounted(() => {
     checkForAlerts('Sensor 5', fakeFlow, fakePressure)
     checkForAlerts('Sensor 6', fakeFlow, fakePressure)
 
-    recordData(fakeFlow, fakePressure)
+    recordData(sensorData.value)
   }, 50) // 模擬 20Hz
 
   // 每秒清一次過期告警
@@ -236,7 +234,7 @@ onUnmounted(() => {
 .alert-log {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
-  gap: 20px;
+  justify-content: space-between;
+  /* gap: 20px; */
 }
 </style>

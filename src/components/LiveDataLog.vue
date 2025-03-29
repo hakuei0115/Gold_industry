@@ -2,8 +2,14 @@
     <div class="data-log">
         <h3>📝 資料紀錄區</h3>
         <ul>
-            <li v-for="(log, index) in logs" :key="index">
-                [{{ log.time }}] Flow: {{ log.flow.toFixed(1) }} | Pressure: {{ log.pressure.toFixed(1) }}
+            <li v-for="(entry, index) in logs" :key="index">
+                <strong>[{{ entry.timestamp }}]</strong>
+                <ul class="sensor-list">
+                    <li v-for="(sensor, name) in entry.sensors" :key="name">
+                        {{ name }} - Flow: {{ sensor.flow.toFixed(1) }} | Pressure:
+                        {{ sensor.pressure.toFixed(1) }}
+                    </li>
+                </ul>
             </li>
             <li v-if="logs.length === 0" class="none">尚無紀錄</li>
         </ul>
@@ -14,15 +20,14 @@
 const props = defineProps({
     logs: {
         type: Array,
-        default: () => []
-    }
-})
+        default: () => [],
+    },
+});
 </script>
 
 <style scoped>
 .data-log {
-    width: 100%;
-    max-width: 600px;
+    width: 50%;
     padding: 12px;
     margin-top: 16px;
     border: 1px solid #ccc;
