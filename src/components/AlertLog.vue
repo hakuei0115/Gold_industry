@@ -38,6 +38,8 @@
 }
 
 .alert-log ul {
+    height: 96%;
+    overflow-y: auto;
     list-style: none;
     padding: 0;
     margin: 0;
